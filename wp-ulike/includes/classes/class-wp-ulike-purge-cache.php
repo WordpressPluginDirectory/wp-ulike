@@ -3,7 +3,7 @@
  * WP ULike purge plugin cache
  * 
  * @package    wp-ulike
- * @author     TechnoWich 2023
+ * @author     TechnoWich 2024
  * @link       https://wpulike.com
 */
 

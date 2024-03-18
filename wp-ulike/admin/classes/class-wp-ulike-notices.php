@@ -3,7 +3,7 @@
  * Wp ULike Admin Notices
  * 
  * @package    wp-ulike
- * @author     TechnoWich 2023
+ * @author     TechnoWich 2024
  * @link       https://wpulike.com
 */
 
@@ -97,7 +97,7 @@ if ( ! class_exists( 'wp_ulike_notices' ) ) {
          * @return void | string
          */
         private function get_skin( $prefix = 'wp-ulike-notice-skin-' ){
-            return $prefix . $this->args['skin'];
+            return $prefix . esc_attr($this->args['skin']);
         }
 
         /**
@@ -310,14 +310,14 @@ if ( ! class_exists( 'wp_ulike_notices' ) ) {
          * Retrieves a transient key.
          */
         private function get_transient_key(){
-            return 'wp-ulike-notice-' . $this->args['id'];
+            return 'wp-ulike-notice-' . esc_attr($this->args['id']);
         }
 
         /**
          * Retrieves a unique id for main wrapper.
          */
         private function get_unique_class(){
-            return 'wp-ulike-notice-id-' . $this->args['id'];
+            return 'wp-ulike-notice-id-' . esc_attr($this->args['id']);
         }
 
         /**
