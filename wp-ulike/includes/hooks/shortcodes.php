@@ -60,14 +60,17 @@ if( ! function_exists( 'wp_ulike_shortcode' ) ){
 		// Generate the shortcode content based on the 'for' attribute
 		switch ( $args['for'] ) {
 			case 'comment':
+                $attributes['slug'] = 'comment';
 				$result = $content . wp_ulike_comments( 'put', $attributes );
 				break;
 
 			case 'activity':
+                $attributes['slug'] = 'activity';
 				$result = $content . wp_ulike_buddypress( 'put', $attributes );
 				break;
 
 			case 'topic':
+                $attributes['slug'] = 'topic';
 				$result = $content . wp_ulike_bbpress( 'put', $attributes );
 				break;
 
@@ -174,7 +177,7 @@ if( ! function_exists( 'wp_ulike_likers_box_shortcode' ) ){
         // Validate the "type" attribute
         $allowed_types = array('post', 'comment', 'activity','topic');
         if (!in_array($args['type'], $allowed_types)) {
-            return esc_html__('Invalid type specified for [wp_ulike_likers_box] shortcode.', WP_ULIKE_SLUG);
+            return esc_html__('Invalid type specified for [wp_ulike_likers_box] shortcode.', 'wp-ulike');
         }
 
         if( empty( $args['id'] ) ){
@@ -199,7 +202,7 @@ if( ! function_exists( 'wp_ulike_likers_box_shortcode' ) ){
 
         // If method not exist, then return error message
         if( empty( $get_settings ) || empty( $args['id'] ) ) {
-            return esc_html__( 'Error receiving input parameters', WP_ULIKE_SLUG );
+            return esc_html__( 'Error receiving input parameters', 'wp-ulike' );
         }
 
         if( ! empty( $args['template']  ) ){
