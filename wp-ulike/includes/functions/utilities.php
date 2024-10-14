@@ -132,7 +132,7 @@ if( ! function_exists( 'wp_ulike_date_i18n' ) ){
 	 */
 	function wp_ulike_date_i18n($date){
 		return date_i18n(
-			get_option( 'date_format' ) . ' @ ' . get_option( 'time_format' ),
+			get_option( 'date_format' ) . ' ' . get_option( 'time_format' ),
 			strtotime($date)
 		);
 	}
@@ -427,4 +427,35 @@ if( ! function_exists('wp_ulike_maybe_define_constant') ){
 			define( $name, $value );
 		}
 	}
+}
+
+if( ! function_exists('wp_ulike_is_valid_nonce') ){
+	/**
+     * Check Field Nonce
+     *
+     * Works the same as check_ajax_referer but also include
+     * request header checks for: X-CSRF-TOKEN and X-WP-NONCE
+	 *
+	 * @param string $action
+	 * @param string $query_arg
+	 * @return bool|int
+	 */
+    function wp_ulike_is_valid_nonce( $action = '', $query_arg = false ) {
+        $nonce = '';
+
+        if ( $query_arg && isset( $_REQUEST[ $query_arg ] ) ) {
+            $nonce = $_REQUEST[ $query_arg ];
+        } elseif ( isset( $_REQUEST['_ajax_nonce'] ) ) {
+            $nonce = $_REQUEST['_ajax_nonce'];
+        } elseif ( isset( $_REQUEST['_wpnonce'] ) ) {
+            $nonce = $_REQUEST['_wpnonce'];
+        } elseif ( isset( $_SERVER['HTTP_X_WP_NONCE'] ) ) {
+            $nonce = $_SERVER['HTTP_X_WP_NONCE'];
+        } elseif ( isset( $_SERVER['HTTP_X_CSRF_TOKEN'] ) ) {
+            $nonce = $_SERVER['HTTP_X_CSRF_TOKEN'];
+        }
+
+        return wp_verify_nonce( $nonce, $action );
+    }
+
 }
