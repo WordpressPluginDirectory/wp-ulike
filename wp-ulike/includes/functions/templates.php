@@ -3,7 +3,7 @@
  * Custom Templates
  * 
  * @package    wp-ulike
- * @author     TechnoWich 2024
+ * @author     TechnoWich 2025
  * @link       https://wpulike.com
  */
 
@@ -70,7 +70,7 @@ if( ! function_exists( 'wp_ulike_set_default_template' ) ){
 		<div class="wpulike wpulike-default <?php echo $wrapper_class; ?>" <?php echo $attributes; ?>>
 			<div class="<?php echo $general_class; ?>">
 				<button type="button"
-					aria-label="<?php echo wp_ulike_get_option( 'like_button_aria_label', esc_html__( 'Like Button','wp-ulike') ) ?>"
+					aria-label="<?php echo wp_ulike_setting_repo::getLikeAriaLabel(); ?>"
 					data-ulike-id="<?php echo $ID; ?>"
 					data-ulike-nonce="<?php echo wp_create_nonce( $type . $ID ); ?>"
 					data-ulike-type="<?php echo $type; ?>"
@@ -119,7 +119,7 @@ if( ! function_exists( 'wp_ulike_set_simple_heart_template' ) ){
 		<div class="wpulike wpulike-heart <?php echo $wrapper_class; ?>" <?php echo $attributes; ?>>
 			<div class="<?php echo $general_class; ?>">
 				<button type="button"
-					aria-label="<?php echo wp_ulike_get_option( 'like_button_aria_label', esc_html__( 'Like Button','wp-ulike') ) ?>"
+					aria-label="<?php echo wp_ulike_setting_repo::getLikeAriaLabel(); ?>"
 					data-ulike-id="<?php echo $ID; ?>"
 					data-ulike-nonce="<?php echo wp_create_nonce( $type  . $ID ); ?>"
 					data-ulike-type="<?php echo $type; ?>"
@@ -168,7 +168,7 @@ if( ! function_exists( 'wp_ulike_set_robeen_template' ) ){
 		<div class="wpulike wpulike-robeen <?php echo $wrapper_class; ?>" <?php echo $attributes; ?>>
 			<div class="<?php echo $general_class; ?>">
 				<button type="button"
-					aria-label="<?php echo wp_ulike_get_option( 'like_button_aria_label', esc_html__( 'Like Button','wp-ulike') ) ?>"
+					aria-label="<?php echo wp_ulike_setting_repo::getLikeAriaLabel(); ?>"
 					data-ulike-id="<?php echo $ID; ?>"
 					data-ulike-nonce="<?php echo wp_create_nonce( $type  . $ID ); ?>"
 					data-ulike-type="<?php echo $type; ?>"
@@ -215,7 +215,7 @@ if( ! function_exists( 'wp_ulike_set_animated_heart_template' ) ){
 		<div class="wpulike wpulike-animated-heart <?php echo $wrapper_class; ?>" <?php echo $attributes; ?>>
 			<div class="<?php echo $general_class; ?>">
 				<button type="button"
-					aria-label="<?php echo wp_ulike_get_option( 'like_button_aria_label', esc_html__( 'Like Button','wp-ulike') ) ?>"
+					aria-label="<?php echo wp_ulike_setting_repo::getLikeAriaLabel(); ?>"
 					data-ulike-id="<?php echo $ID; ?>"
 					data-ulike-nonce="<?php echo wp_create_nonce( $type  . $ID ); ?>"
 					data-ulike-type="<?php echo $type; ?>"

@@ -3,7 +3,7 @@
  * Wp ULike Admin Customize
  * 
  * @package    wp-ulike
- * @author     TechnoWich 2024
+ * @author     TechnoWich 2025
  * @link       https://wpulike.com
 */
 
@@ -44,7 +44,7 @@ if ( ! class_exists( 'wp_ulike_customizer' ) ) {
 
             ULF::createSection( $this->option_domain, array(
                 'id'    => WP_ULIKE_SLUG,   // Set a unique slug-like ID
-                'title' => WP_ULIKE_NAME
+                'title' => esc_html__( 'WP ULike', 'wp-ulike' )
             ) );
 
             ULF::createSection( $this->option_domain, array(

@@ -3,7 +3,7 @@
  * Wp ULike Admin Panel
  * 
  * @package    wp-ulike
- * @author     TechnoWich 2024
+ * @author     TechnoWich 2025
  * @link       https://wpulike.com
 */
 
@@ -41,8 +41,8 @@ if ( ! class_exists( 'wp_ulike_admin_panel' ) ) {
         public function register_panel(){
             // Create options
             ULF::createOptions( $this->option_domain, array(
-                'framework_title'    => apply_filters( 'wp_ulike_plugin_name', WP_ULIKE_NAME ),
-                'menu_title'         => apply_filters( 'wp_ulike_plugin_name', WP_ULIKE_NAME ),
+                'framework_title'    => apply_filters( 'wp_ulike_plugin_name', esc_html__( 'WP ULike', 'wp-ulike' ) ),
+                'menu_title'         => apply_filters( 'wp_ulike_plugin_name', esc_html__( 'WP ULike', 'wp-ulike' ) ),
                 'sub_menu_title'     => esc_html__( 'Settings', 'wp-ulike' ),
                 'menu_slug'          => 'wp-ulike-settings',
                 'menu_capability'    => 'manage_options',

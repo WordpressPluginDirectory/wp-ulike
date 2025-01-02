@@ -3,7 +3,7 @@
  * About page template
  * 
  * @package    wp-ulike
- * @author     TechnoWich 2024
+ * @author     TechnoWich 2025
  * @link       https://wpulike.com
  */
 

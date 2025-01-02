@@ -3,7 +3,7 @@
  * Back-end AJAX Functionalities
  * 
  * @package    wp-ulike
- * @author     TechnoWich 2024
+ * @author     TechnoWich 2025
  * @link       https://wpulike.com
  */
 
@@ -104,7 +104,7 @@ add_action('wp_ajax_wp_ulike_delete_history_api','wp_ulike_delete_history_api');
  * @return void
  */
 function wp_ulike_localization_api(){
-	if( ! current_user_can( wp_ulike_get_user_access_capability('stats') ) || ! wp_ulike_is_valid_nonce( WP_ULIKE_SLUG ) ){
+	if( ! current_user_can( wp_ulike_get_user_access_capability('stats') ) ){
 		wp_send_json_error( esc_html__( 'Error: You do not have permission to do that.', 'wp-ulike' ) );
 	}
 

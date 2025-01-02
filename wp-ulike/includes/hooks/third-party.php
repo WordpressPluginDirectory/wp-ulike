@@ -3,7 +3,7 @@
  * Third-Party Plugins
  * 
  * @package    wp-ulike
- * @author     TechnoWich 2024
+ * @author     TechnoWich 2025
  * @link       https://wpulike.com
  */
 
@@ -648,7 +648,7 @@ if( ! function_exists( 'wp_ulike_register_myCRED_hook' ) ){
 	 */
 	function wp_ulike_register_myCRED_hook( $installed ) {
 		$installed['wp_ulike'] = array(
-			'title'       => WP_ULIKE_NAME . ' : ' .  esc_html__( 'Points for liking content', 'wp-ulike' ),
+			'title'       => esc_html__( 'WP ULike', 'wp-ulike' ) . ' : ' .  esc_html__( 'Points for liking content', 'wp-ulike' ),
 			'description' => esc_html__( 'This hook award / deducts points from users who Like/Unlike any content of WordPress, bbPress, BuddyPress & ...', 'wp-ulike' ),
 			'callback'    => array( 'wp_ulike_myCRED' )
 		);
