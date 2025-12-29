@@ -58,7 +58,7 @@ if ( ! class_exists( 'wp_ulike_customizer' ) ) {
                     array(
                         'type'    => 'submessage',
                         'style'   => 'info',
-                        'content' => esc_html__( 'In this section, you can customize the template wrapper styles.', 'wp-ulike' ),
+                        'content' => esc_html__( 'In this section, you can customize the styles.', 'wp-ulike' ),
                     ),
                     array(
                         'id'               => 'template_typography',
@@ -154,7 +154,7 @@ if ( ! class_exists( 'wp_ulike_customizer' ) ) {
                     array(
                         'type'    => 'submessage',
                         'style'   => 'info',
-                        'content' => esc_html__( 'In this section, you can customize the styles related to the buttons. Please note that some buttons have different structures (such as SVG based) and therefore you should be more careful in setting them.', 'wp-ulike' ),
+                        'content' => esc_html__( 'In this section, you can customize the styles. Please note that some buttons have different structures (such as SVG based) and therefore you should be more careful in setting them.', 'wp-ulike' ),
                     ),
                     array(
                         'id'            => 'button_group',
@@ -307,7 +307,7 @@ if ( ! class_exists( 'wp_ulike_customizer' ) ) {
                     array(
                         'type'    => 'submessage',
                         'style'   => 'info',
-                        'content' => esc_html__( 'In this section, you can customize the template counter styles.', 'wp-ulike' ),
+                        'content' => esc_html__( 'In this section, you can customize the styles.', 'wp-ulike' ),
                     ),
                     array(
                         'id'            => 'counter_group',
@@ -554,7 +554,7 @@ if ( ! class_exists( 'wp_ulike_customizer' ) ) {
 
             ULF::createSection( $this->option_domain, array(
                 'parent' => WP_ULIKE_SLUG,                           // The slug id of the parent section
-                'title'  => esc_html__( 'Likers Box', 'wp-ulike' ),
+                'title'  => esc_html__( 'Display Likers Box', 'wp-ulike' ),
                 'fields' => array(
                     array(
                         'type'    => 'heading',

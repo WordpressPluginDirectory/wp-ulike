@@ -3,12 +3,12 @@
  * Plugin Name:       WP ULike
  * Plugin URI:        https://wpulike.com/?utm_source=wp-plugins&utm_campaign=plugin-uri&utm_medium=wp-dash
  * Description:       Looking to increase user engagement on your WordPress site? WP ULike plugin lets you easily add voting buttons to your content. With customizable settings and detailed analytics, you can track user engagement, optimize your content, and build a loyal following.
- * Version:           4.7.9.1
+ * Version:           4.8.3
  * Author:            TechnoWich
  * Author URI:        https://technowich.com/?utm_source=wp-plugins&utm_campaign=author-uri&utm_medium=wp-dash
  * Text Domain:       wp-ulike
  * Domain Path:       /languages
- * Tested up to: 	  6.7
+ * Tested up to: 	  6.9
  * License: GPL-2.0+
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  *
@@ -30,8 +30,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Do not change these values
 define( 'WP_ULIKE_PLUGIN_URI'   , 'https://wpulike.com/' 		 			);
-define( 'WP_ULIKE_VERSION'      , '4.7.9.1' 					 		    );
-define( 'WP_ULIKE_DB_VERSION'   , '2.3' 					 	 			);
+define( 'WP_ULIKE_VERSION'      , '4.8.3' 					 		    	);
+define( 'WP_ULIKE_DB_VERSION'   , '2.4' 					 	 			);
 define( 'WP_ULIKE_SLUG'         , 'wp-ulike' 					 			);
 define( 'WP_ULIKE_NAME'         , 'WP ULike'	    						);
 
@@ -57,12 +57,22 @@ require WP_ULIKE_INC_DIR . '/action.php';
 register_activation_hook  ( __FILE__, array( 'wp_ulike_register_action_hook', 'activate'   ) );
 register_deactivation_hook( __FILE__, array( 'wp_ulike_register_action_hook', 'deactivate' ) );
 
+// Load Pro license validator
+require_once WP_ULIKE_INC_DIR . '/pro.php';
+
 if ( ! version_compare( PHP_VERSION, '7.2.5', '>=' ) ) {
 	add_action( 'admin_notices', 'wp_ulike_fail_php_version' );
 } elseif ( ! version_compare( get_bloginfo( 'version' ), '6.0', '>=' ) ) {
 	add_action( 'admin_notices', 'wp_ulike_fail_wp_version' );
-} elseif( ! class_exists( 'WpUlikeInit' ) ) {
-	require WP_ULIKE_INC_DIR . '/plugin.php';
+} else {
+	// Show notice if Pro version has invalid license, but still allow plugin to run
+	if ( WP_Ulike_Pro_Validator::check_license_validity() === false ) {
+		add_action( 'admin_notices', array( 'WP_Ulike_Pro_Validator', 'fail_pro_license_notice' ) );
+	}
+
+	if( ! class_exists( 'WpUlikeInit' ) ) {
+		require WP_ULIKE_INC_DIR . '/plugin.php';
+	}
 }
 
 /**
@@ -74,7 +84,7 @@ if ( ! version_compare( PHP_VERSION, '7.2.5', '>=' ) ) {
  */
 function wp_ulike_fail_php_version() {
 	/* translators: %s: PHP version */
-	$message = sprintf( esc_html__( 'WP ULike requires PHP version %s+, plugin is currently NOT RUNNING.', 'wp-ulike' ), '7.2' );
+	$message = sprintf( esc_html__( 'WP ULike requires PHP version %s+, plugin is currently NOT RUNNING.', 'wp-ulike' ), '7.2.5' );
 	$html_message = sprintf( '<div class="error">%s</div>', wpautop( $message ) );
 	echo wp_kses_post( $html_message );
 }

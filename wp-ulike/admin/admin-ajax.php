@@ -124,8 +124,8 @@ function wp_ulike_localization_api(){
 		'Total Interactions To Date'                               => esc_html__( 'Total Interactions To Date', 'wp-ulike' ),
 		'Today\'s Engagement Overview'                             => esc_html__( 'Today\'s Engagement Overview', 'wp-ulike' ),
 		'Yesterday\'s Engagement Summary'                          => esc_html__( 'Yesterday\'s Engagement Summary', 'wp-ulike' ),
-		'Device type'                                              => esc_html__( 'Device type', 'wp-ulike' ),
-		'Explore the variety of user devices.'                     => esc_html__( 'Explore the variety of user devices.', 'wp-ulike' ),
+		'Device Insights'                                          => esc_html__( 'Device Insights', 'wp-ulike' ),
+		'Track devices, systems and browsers'                      => esc_html__( 'Track devices, systems and browsers', 'wp-ulike' ),
 		'Engagement This Week'                                     => esc_html__( 'Engagement This Week', 'wp-ulike' ),
 		'Monthly Engagement Overview'                              => esc_html__( 'Monthly Engagement Overview', 'wp-ulike' ),
 		'Yearly Engagement Trends'                                 => esc_html__( 'Yearly Engagement Trends', 'wp-ulike' ),
@@ -150,6 +150,7 @@ function wp_ulike_localization_api(){
 		'User(s)'                                                  => esc_html__( 'User(s)', 'wp-ulike' ),
 		'Other Countries'                                          => esc_html__( 'Other Countries', 'wp-ulike' ),
 		'for'                                                      => esc_html__( 'for', 'wp-ulike' ),
+		'Growth'                                                   => esc_html__( 'Growth', 'wp-ulike' ),
 
 		// Filters
 		'Like'                   => esc_html__( 'Like', 'wp-ulike' ),
@@ -165,7 +166,12 @@ function wp_ulike_localization_api(){
 		'This Year'              => esc_html__( 'This Year', 'wp-ulike' ),
 		'Last Year'              => esc_html__( 'Last Year', 'wp-ulike' ),
 		'Status Filter'          => esc_html__( 'Status Filter', 'wp-ulike' ),
+		'Content Types'          => esc_html__( 'Content Types', 'wp-ulike' ),
 		'Post Types'             => esc_html__( 'Post Types', 'wp-ulike' ),
+		'View By'                => esc_html__( 'View By', 'wp-ulike' ),
+		'Device'                 => esc_html__( 'Device', 'wp-ulike' ),
+		'OS'                     => esc_html__( 'OS', 'wp-ulike' ),
+		'Browser'                => esc_html__( 'Browser', 'wp-ulike' ),
 		'Show Filters'           => esc_html__( 'Show Filters', 'wp-ulike' ),
 		'Hide Filters'           => esc_html__( 'Hide Filters', 'wp-ulike' ),
 		'Clear all'              => esc_html__( 'Clear all', 'wp-ulike' ),
@@ -185,6 +191,7 @@ function wp_ulike_localization_api(){
 		'Engagement'    => esc_html__( 'Engagement', 'wp-ulike' ),
 		'Comments'      => esc_html__( 'Comments', 'wp-ulike' ),
 		'By'            => esc_html__( 'By', 'wp-ulike' ),
+		'Views'         => esc_html__( 'Views', 'wp-ulike' ),
 
 		// History
 		'Date'            => esc_html__( 'Date', 'wp-ulike' ),
@@ -209,6 +216,7 @@ function wp_ulike_localization_api(){
 		'Delete Selected' => esc_html__( 'Delete Selected', 'wp-ulike' ),
 		'Filter by type:' => esc_html__( 'Filter by type:', 'wp-ulike' ),
 		'per page'        => esc_html__( 'per page', 'wp-ulike' ),
+		'View all'        => esc_html__( 'View all', 'wp-ulike' ),
 
 		// Types
 		'Posts'      => esc_html__('Posts', 'wp-ulike'),
@@ -217,9 +225,18 @@ function wp_ulike_localization_api(){
 		'Topics'     => esc_html__('Topics', 'wp-ulike'),
 		'Engagers'   => esc_html__('Engagers', 'wp-ulike'),
 
-		// 404
-		'Nothing to See Here!'                                      => esc_html__( 'Nothing to See Here!', 'wp-ulike' ),
-		'No content available. Try refreshing or check back later.' => esc_html__( 'No content available. Try refreshing or check back later.', 'wp-ulike' ),
+		// Not found
+		'Something Went Wrong'	=> esc_html__( 'Something Went Wrong', 'wp-ulike' ),
+		'We encountered an error while loading the data. Please try refreshing the page or contact support if the problem persists.' => esc_html__( 'We encountered an error while loading the data. Please try refreshing the page or contact support if the problem persists.', 'wp-ulike' ),
+		'Page Not Found'	=> esc_html__( 'Page Not Found', 'wp-ulike' ),
+		'The page you are looking for does not exist. It may have been moved or deleted.' => esc_html__( 'The page you are looking for does not exist. It may have been moved or deleted.', 'wp-ulike' ),
+		'No Data Available'	=> esc_html__( 'No Data Available', 'wp-ulike' ),
+		'There is no data to display at the moment. This could mean there are no records in the database yet, or the data is still being processed.' => esc_html__( 'There is no data to display at the moment. This could mean there are no records in the database yet, or the data is still being processed.', 'wp-ulike' ),
+		'Go to Home'	=> esc_html__( 'Go to Home', 'wp-ulike' ),
+		'Refresh Page'	=> esc_html__( 'Refresh Page', 'wp-ulike' ),
+		'If this problem continues, please contact support.'	=> esc_html__( 'If this problem continues, please contact support.', 'wp-ulike' ),
+		'Data will appear here once it becomes available.'	=> esc_html__( 'Data will appear here once it becomes available.', 'wp-ulike' ),
+		'Check the URL or return to the homepage.'	=> esc_html__( 'Check the URL or return to the homepage.', 'wp-ulike' ),
 
 		// Banners
 		'Unlock Your Website\'s True Potential!' => esc_html__( 'Unlock Your Website\'s True Potential!', 'wp-ulike'),

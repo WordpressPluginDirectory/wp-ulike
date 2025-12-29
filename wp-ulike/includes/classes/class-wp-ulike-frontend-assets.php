@@ -67,13 +67,13 @@ if ( ! class_exists( 'wp_ulike_frontend_assets' ) ) {
 	     * @return void
 	     */
 	  	public function load_scripts() {
-			// Return if pro assets exist
-			if( defined( 'WP_ULIKE_PRO_VERSION' ) && version_compare( WP_ULIKE_PRO_VERSION, '1.5.3' ) > 0 ){
+			// Return if pro assets exist (Pro >= 1.5.3 includes free scripts, so don't load free version)
+			if( defined( 'WP_ULIKE_PRO_VERSION' ) && version_compare( WP_ULIKE_PRO_VERSION, '1.5.3', '>=' ) ){
 				return;
 			}
 
 			//Add wp_ulike script file with special functions.
-			wp_enqueue_script( 'wp_ulike', WP_ULIKE_ASSETS_URL . '/js/wp-ulike.min.js', array( 'jquery' ), WP_ULIKE_VERSION, true );
+			wp_enqueue_script( 'wp_ulike', WP_ULIKE_ASSETS_URL . '/js/wp-ulike.min.js', array(), WP_ULIKE_VERSION, true );
 
 			//localize script
 			wp_localize_script( 'wp_ulike', 'wp_ulike_params', array(

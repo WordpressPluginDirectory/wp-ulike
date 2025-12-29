@@ -35,7 +35,7 @@ if ( ! class_exists( 'wp_ulike_admin_pages' ) ) {
 					'load_screen' => false
 				),
 				'about'           => array(
-					'title'       => esc_html__( 'About', 'wp-ulike' ),
+					'title'       => sprintf( '<span class="wp-ulike-menu-icon"><span class="dashicons dashicons-info"></span> %s</span>', esc_html__( 'About', 'wp-ulike' ) ),
 					'parent_slug' => 'wp-ulike-settings',
 					'capability'  => wp_ulike_get_user_access_capability('stats'),
 					'path'        => WP_ULIKE_ADMIN_DIR . '/includes/templates/about.php',
@@ -59,8 +59,13 @@ if ( ! class_exists( 'wp_ulike_admin_pages' ) ) {
 
 			// Register submenus
 			foreach ( $this->submenus as $key => $args) {
-				// extract variables
-				extract( $args );
+				// Extract variables explicitly per WordPress coding standards
+				$parent_slug = isset( $args['parent_slug'] ) ? $args['parent_slug'] : '';
+				$title = isset( $args['title'] ) ? $args['title'] : '';
+				$menu_slug = isset( $args['menu_slug'] ) ? $args['menu_slug'] : '';
+				$capability = isset( $args['capability'] ) ? $args['capability'] : 'manage_options';
+				$load_screen = isset( $args['load_screen'] ) ? $args['load_screen'] : false;
+				$path = isset( $args['path'] ) ? $args['path'] : '';
 
 				$hook_suffix = add_submenu_page(
 					$parent_slug,
