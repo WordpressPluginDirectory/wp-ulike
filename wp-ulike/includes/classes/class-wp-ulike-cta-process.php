@@ -3,7 +3,7 @@
  * WP ULike Process Class
  * 
  * @package    wp-ulike
- * @author     TechnoWich 2025
+ * @author     TechnoWich 2026
  * @link       https://wpulike.com
  */
 
@@ -37,7 +37,7 @@ if ( ! class_exists( 'wp_ulike_cta_process' ) ) {
 			$this->parsedArgs = wp_parse_args( $atts, $default_atts );
 
 			// Get settings type
-			$this->settings   = new wp_ulike_setting_type( $this->parsedArgs['item_type'] );
+			$this->settings   = wp_ulike_setting_type::get_instance( $this->parsedArgs['item_type'] );
 
 			parent::__construct( array(
 				'user_id'     => $this->parsedArgs['user_id'],

@@ -7,7 +7,7 @@ import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { PanelBody, SelectControl, TextControl, ToggleControl, Spinner, ButtonGroup, Button, Icon, Notice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import ServerSideRender from '@wordpress/server-side-render';
+import { ServerSideRender } from '@wordpress/server-side-render';
 import { useEffect, useState } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 
@@ -53,7 +53,7 @@ if ( ! getBlockType( metadata.name ) ) {
 		// Item type options (only Post and Comment)
 		const itemTypeOptions = [
 			{ label: __( 'Post', 'wp-ulike' ), value: 'post' },
-			{ label: __( 'Comment', 'wp-ulike' ), value: 'comment' }
+			{ label: __( 'Comment', 'wp-ulike' ), value: 'comment' },
 		];
 
 		// Fetch templates from REST API (only once)
@@ -125,7 +125,10 @@ if ( ! getBlockType( metadata.name ) ) {
 									isDismissible={ false }
 									className="wp-ulike-comment-context-notice"
 								>
-									{ __( 'Comment buttons work best when placed inside a Comment Template block. They will automatically use the current comment ID.', 'wp-ulike' ) }
+									{ __(
+										'Comment buttons work best when placed inside a Comment Template block. They will automatically use the current comment ID.',
+										'wp-ulike'
+									) }
 								</Notice>
 							</div>
 						) }
@@ -145,7 +148,10 @@ if ( ! getBlockType( metadata.name ) ) {
 							checked={ useCurrentPostId }
 							onChange={ ( value ) => setAttributes( { useCurrentPostId: value } ) }
 							help={ useCurrentPostId
-								? __( 'Automatically uses the current post or comment ID. You can optionally add a custom ID below to combine with it.', 'wp-ulike' )
+								? __(
+									'Automatically uses the current post or comment ID. You can optionally add a custom ID below to combine with it.',
+									'wp-ulike'
+								)
 								: __( 'Disable to use a custom item ID instead of the current one.', 'wp-ulike' )
 							}
 							__nextHasNoMarginBottom={ true }
@@ -156,8 +162,14 @@ if ( ! getBlockType( metadata.name ) ) {
 							value={ itemId }
 							onChange={ ( value ) => setAttributes( { itemId: value } ) }
 							help={ useCurrentPostId
-								? __( 'Optional: Enter a number to combine with the current item ID. Example: If current ID is 42 and you enter 100, the final ID will be 42100. Useful for creating multiple interactive buttons on the same post. Note: Custom combined IDs will not appear in statistics/insights.', 'wp-ulike' )
-								: __( 'Enter a specific item ID to use. Leave empty to automatically detect the current item ID. Note: Custom IDs will not appear in statistics/insights.', 'wp-ulike' )
+								? __(
+									'Optional: Enter a number to combine with the current item ID. Example: If current ID is 42 and you enter 100, the final ID will be 42100. Useful for creating multiple interactive buttons on the same post. Note: Custom combined IDs will not appear in statistics/insights.',
+									'wp-ulike'
+								)
+								: __(
+									'Enter a specific item ID to use. Leave empty to automatically detect the current item ID. Note: Custom IDs will not appear in statistics/insights.',
+									'wp-ulike'
+								)
 							}
 							type="number"
 							placeholder={ useCurrentPostId ? __( 'Leave empty or enter number to combine', 'wp-ulike' ) : __( 'Enter item ID', 'wp-ulike' ) }
@@ -177,35 +189,47 @@ if ( ! getBlockType( metadata.name ) ) {
 							} }>
 								{ allTemplates.map( ( tmpl ) => {
 									const isSelected = template === tmpl.key;
+									const isLocked = tmpl.is_locked === true || tmpl.is_locked === 'true' || tmpl.is_locked === 1;
 									return (
 										<button
 											key={ tmpl.key || 'default' }
 											type="button"
-											onClick={ () => setAttributes( { template: tmpl.key } ) }
-											className={ `wp-ulike-template-option ${ isSelected ? 'is-selected' : '' }` }
+											onClick={ () => {
+												if ( ! isLocked ) {
+													setAttributes( { template: tmpl.key } );
+												}
+											} }
+											disabled={ isLocked }
+											className={ `wp-ulike-template-option ${ isSelected ? 'is-selected' : '' } ${ isLocked ? 'is-locked' : '' }` }
 											style={ {
 												display: 'flex',
 												flexDirection: 'column',
 												alignItems: 'center',
 												justifyContent: 'center',
 												padding: '10px 8px',
-												border: `1.5px solid ${ isSelected ? '#0073aa' : '#ddd' }`,
+												border: `1.5px solid ${ isSelected ? '#0073aa' : isLocked ? '#ccc' : '#ddd' }`,
 												borderRadius: '3px',
-												background: '#fff',
-												cursor: 'pointer',
-												transition: 'border-color 0.15s ease'
+												background: isLocked ? '#f5f5f5' : '#fff',
+												cursor: isLocked ? 'not-allowed' : 'pointer',
+												transition: 'border-color 0.15s ease',
+												opacity: isLocked ? 0.6 : 1,
+												position: 'relative'
 											} }
 											onMouseEnter={ ( e ) => {
-												if ( ! isSelected ) {
+												if ( ! isSelected && ! isLocked ) {
 													e.currentTarget.style.borderColor = '#bbb';
 												}
 											} }
 											onMouseLeave={ ( e ) => {
-												if ( ! isSelected ) {
+												if ( ! isSelected && ! isLocked ) {
 													e.currentTarget.style.borderColor = '#ddd';
 												}
 											} }
-											title={ tmpl.name }
+											title={
+												isLocked
+													? `${ tmpl.name } (${ __( 'Pro Feature', 'wp-ulike' ) })`
+													: tmpl.name
+											}
 										>
 											<div style={ {
 												width: '50px',
@@ -213,7 +237,8 @@ if ( ! getBlockType( metadata.name ) ) {
 												marginBottom: '6px',
 												display: 'flex',
 												alignItems: 'center',
-												justifyContent: 'center'
+												justifyContent: 'center',
+												position: 'relative'
 											} }>
 												{ tmpl.symbol ? (
 													<img
@@ -223,7 +248,7 @@ if ( ! getBlockType( metadata.name ) ) {
 															width: '50px',
 															height: '50px',
 															objectFit: 'contain',
-															filter: isSelected ? 'brightness(40%) sepia(100%) hue-rotate(170deg) saturate(250%)' : 'none',
+															filter: isSelected ? 'brightness(40%) sepia(100%) hue-rotate(170deg) saturate(250%)' : isLocked ? 'grayscale(100%) opacity(0.5)' : 'none',
 															transition: 'filter 0.15s ease'
 														} }
 													/>
@@ -232,9 +257,24 @@ if ( ! getBlockType( metadata.name ) ) {
 														icon="admin-settings"
 														size={ 32 }
 														style={ {
-															filter: isSelected ? 'brightness(40%) sepia(100%) hue-rotate(170deg) saturate(250%)' : 'none',
+															filter: isSelected ? 'brightness(40%) sepia(100%) hue-rotate(170deg) saturate(250%)' : isLocked ? 'grayscale(100%) opacity(0.5)' : 'none',
 															transition: 'filter 0.15s ease',
 															color: '#646970'
+														} }
+													/>
+												) }
+												{ isLocked && (
+													<Icon
+														icon="lock"
+														size={ 16 }
+														style={ {
+															position: 'absolute',
+															top: '2px',
+															right: '2px',
+															color: '#d63638',
+															background: '#fff',
+															borderRadius: '50%',
+															padding: '2px'
 														} }
 													/>
 												) }
@@ -242,7 +282,7 @@ if ( ! getBlockType( metadata.name ) ) {
 											<span style={ {
 												fontSize: '10px',
 												textAlign: 'center',
-												color: isSelected ? '#0073aa' : '#666',
+												color: isSelected ? '#0073aa' : isLocked ? '#999' : '#666',
 												fontWeight: '400',
 												lineHeight: '1.3',
 												wordBreak: 'break-word'
@@ -285,7 +325,7 @@ if ( ! getBlockType( metadata.name ) ) {
 							} }>
 								<Spinner />
 								<span style={ { color: '#757575', fontSize: '13px' } }>
-									{ __( 'Loading preview...', 'wp-ulike' ) }
+									{ __( 'Loading...', 'wp-ulike' ) }
 								</span>
 							</div>
 						) }

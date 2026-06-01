@@ -3,7 +3,7 @@
  * General Hooks
  * 
  * @package    wp-ulike
- * @author     TechnoWich 2025
+ * @author     TechnoWich 2026
  * @link       https://wpulike.com
  */
 
@@ -25,25 +25,29 @@ if( ! function_exists( 'wp_ulike_put_posts' ) ){
 	 * @return string
 	 */
 	function wp_ulike_put_posts( $content ) {
+		// Early exit optimization: Check if auto-display is enabled before any processing
+		// This prevents unnecessary function calls and option lookups when disabled
+		if ( ! WpUlikeInit::is_frontend() || ! in_the_loop() || ! is_main_query() || ! wp_ulike_setting_repo::isAutoDisplayOn('post') ) {
+			return apply_filters( 'wp_ulike_the_content', $content, $content );
+		}
+
 		// Stack variable
 		$output = $content;
-		if ( WpUlikeInit::is_frontend() && in_the_loop() && is_main_query() && wp_ulike_setting_repo::isAutoDisplayOn('post') ) {
-			if(	is_wp_ulike( wp_ulike_setting_repo::getPostAutoDisplayFilters() ) ){
-				// Get button
-				$button = wp_ulike('put');
-				switch ( wp_ulike_get_option( 'posts_group|auto_display_position', 'bottom' ) ) {
-					case 'top':
-						$output = $button . $content;
-						break;
+		if(	is_wp_ulike( wp_ulike_setting_repo::getPostAutoDisplayFilters() ) ){
+			// Get button
+			$button = wp_ulike('put');
+			switch ( wp_ulike_get_option( 'posts_group|auto_display_position', 'bottom' ) ) {
+				case 'top':
+					$output = $button . $content;
+					break;
 
-					case 'top_bottom':
-						$output = $button . $content . $button;
-						break;
+				case 'top_bottom':
+					$output = $button . $content . $button;
+					break;
 
-					default:
-						$output = $content . $button;
-						break;
-				}
+				default:
+					$output = $content . $button;
+					break;
 			}
 		}
 
@@ -234,17 +238,18 @@ if( ! function_exists( 'wp_ulike_update_button_icon' ) ){
 	add_action( 'wp_ulike_inside_template', 'wp_ulike_update_button_icon', 1 );
 }
 
-if( ! function_exists( 'wp_ulike_deprecated_csf_class' ) ){
+if( ! function_exists( 'wp_ulike_load_deprecated_classes' ) ){
 	/**
-	 * Require deprecated CSF class
+	 * Load deprecated classes for backward compatibility
 	 *
 	 * @return void
 	 */
-	function wp_ulike_deprecated_csf_class(){
-		// include _deprecated settings panel
-		require_once( WP_ULIKE_ADMIN_DIR . '/settings/_deprecated/deprecated.class.php');
+	function wp_ulike_load_deprecated_classes(){
+		// Include deprecated class - it will check if ULF exists before defining itself
+		require_once( WP_ULIKE_ADMIN_DIR . '/includes/deprecated.class.php');
 	}
-	add_action( 'plugins_loaded', 'wp_ulike_deprecated_csf_class' );
+	// Load on plugins_loaded with low priority to ensure real ULF loads first if available
+	add_action( 'plugins_loaded', 'wp_ulike_load_deprecated_classes', 999 );
 }
 
 
@@ -376,4 +381,3 @@ if( ! function_exists( 'wp_ulike_delete_activity_votes' ) ){
 	}
 	add_action( 'bp_activity_delete', 'wp_ulike_delete_activity_votes', 1, 10 );
 }
-

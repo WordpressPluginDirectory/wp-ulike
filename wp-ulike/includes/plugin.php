@@ -4,7 +4,7 @@
  *
  * 
  * @package    wp-ulike
- * @author     TechnoWich 2025
+ * @author     TechnoWich 2026
  * @link       https://wpulike.com
  */
 
@@ -35,10 +35,6 @@ class WpUlikeInit {
 
     // This hook is called once any activated plugins have been loaded.
     add_action( 'plugins_loaded', array( $this, 'plugins_loaded' ) );
-
-    // Activate plugin when new blog is added
-    add_action( 'activated_plugin', array( $this, 'after_activation' ) );
-
 
     $prefix = is_network_admin() ? 'network_admin_' : '';
     add_filter( "{$prefix}plugin_action_links",  array( $this, 'add_links' ), 10, 5 );
@@ -112,6 +108,7 @@ class WpUlikeInit {
     // a custom directory in uploads directory for storing custom files. Default uploads/{WP_ULIKE_SLUG}
     $uploads = wp_get_upload_dir();
     define( 'WP_ULIKE_CUSTOM_DIR' , $uploads['basedir'] . '/' . WP_ULIKE_SLUG );
+    define( 'WP_ULIKE_CUSTOM_URL' , $uploads['baseurl'] . '/' . WP_ULIKE_SLUG );
   }
 
   /**
@@ -126,7 +123,7 @@ class WpUlikeInit {
     if (  $plugin_file === WP_ULIKE_BASENAME ) {
       $settings = array('settings'  => '<a href="admin.php?page=wp-ulike-settings">' . esc_html__('Settings', 'wp-ulike') . '</a>');
       $stats    = array('stats'     => '<a href="admin.php?page=wp-ulike-statistics">' . esc_html__('Statistics', 'wp-ulike') . '</a>');
-      $about    = array('about'     => '<a href="admin.php?page=wp-ulike-about">' . esc_html__('About', 'wp-ulike') . '</a>');
+      $about    = array('overview'  => '<a href="admin.php?page=wp-ulike-about">' . esc_html__( 'Help', 'wp-ulike' ) . '</a>');
       // Merge on actions array
       $actions  = array_merge( $about, $actions );
       $actions  = array_merge( $stats, $actions );
@@ -169,13 +166,7 @@ class WpUlikeInit {
   */
   private function includes() {
     // Auto-load classes on demand
-    if ( function_exists( "__autoload" ) ) {
-      spl_autoload_register( "__autoload" );
-    }
     spl_autoload_register( array( $this, 'autoload' ) );
-
-    // load packages
-    include_once( WP_ULIKE_DIR . '/vendor/autoload.php' );
 
     // load common functionalities
     include_once( WP_ULIKE_INC_DIR . '/index.php' );
@@ -252,19 +243,6 @@ class WpUlikeInit {
     _deprecated_function( 'get_ip', '4.2.7', 'wp_ulike_get_user_ip' );
     // Get user IP
     return wp_ulike_get_user_ip();
-  }
-
-  /**
-   * Plugin redirect after activation
-   *
-   * @param string $plugin
-   * @return void
-   */
-  public function after_activation( $plugin ) {
-    if( $plugin == WP_ULIKE_BASENAME ) {
-      // Redirect to the about page
-      if( wp_safe_redirect( admin_url( 'admin.php?page=wp-ulike-about' ) ) ) exit;
-    }
   }
 
   /**

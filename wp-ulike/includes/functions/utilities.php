@@ -3,7 +3,7 @@
  * Utilities
  * 
  * @package    wp-ulike
- * @author     TechnoWich 2025
+ * @author     TechnoWich 2026
  * @link       https://wpulike.com
  */
 
@@ -138,36 +138,42 @@ if( ! function_exists( 'wp_ulike_date_i18n' ) ){
 	}
 }
 
+if( ! function_exists( 'wp_ulike_ip_in_range' ) ){
+	/**
+	 * Check if an IP address is within a CIDR range
+	 *
+	 * @param string $ip IP address to check
+	 * @param string $range CIDR range (e.g., '192.168.1.0/24' or '2001:db8::/32')
+	 * @return bool
+	 */
+	function wp_ulike_ip_in_range( $ip, $range ) {
+		return WP_Ulike_Ip_Detector::ip_in_range( $ip, $range );
+	}
+}
+
+if( ! function_exists( 'wp_ulike_is_cloudflare_ip' ) ){
+	/**
+	 * Check if the current request is from Cloudflare
+	 *
+	 * @param string|null $ip IP address to check (optional, defaults to REMOTE_ADDR)
+	 * @return bool
+	 */
+	function wp_ulike_is_cloudflare_ip( $ip = null ) {
+		return WP_Ulike_Ip_Detector::is_cloudflare_ip( $ip );
+	}
+}
+
 if( ! function_exists( 'wp_ulike_get_user_ip' ) ){
 	/**
-	 * Get user IP
+	 * Get user IP address
+	 *
+	 * Handles Cloudflare, proxy headers, and direct connections.
+	 * Uses WP_Ulike_Ip_Detector class for IP detection.
 	 *
 	 * @return string
 	 */
 	function wp_ulike_get_user_ip(){
-        $whitelist = [];
-        $isUsingCloudflare = !empty(filter_input(INPUT_SERVER, 'CF-Connecting-IP'));
-
-        if (apply_filters('wp_ulike_whip_whitelist_cloudflare', $isUsingCloudflare)) {
-            $cloudflareIps = wp_ulike_get_cloudflare_ips();
-            $whitelist[\Vectorface\Whip\Whip::CLOUDFLARE_HEADERS] = [\Vectorface\Whip\Whip::IPV4 => $cloudflareIps['v4']];
-            if (defined('AF_INET6')) {
-                $whitelist[\Vectorface\Whip\Whip::CLOUDFLARE_HEADERS][\Vectorface\Whip\Whip::IPV6] = $cloudflareIps['v6'];
-            }
-        }
-
-        $whitelist = apply_filters('wp_ulike_whip_whitelist', $whitelist);
-        $methods   = apply_filters('wp_ulike_whip_methods', \Vectorface\Whip\Whip::ALL_METHODS);
-
-        $whip = new \Vectorface\Whip\Whip($methods, $whitelist);
-
-		do_action( 'wp_ulike_whip_action', $whip );
-
-		if (false === ($clientAddress = $whip->getValidIpAddress())) {
-            $clientAddress = '127.0.0.1';
-        }
-
-		return apply_filters( 'wp_ulike_get_user_ip', $clientAddress );
+		return WP_Ulike_Ip_Detector::get_ip();
 	}
 }
 
@@ -179,7 +185,7 @@ if( ! function_exists( 'wp_ulike_validate_ip' ) ){
 	 * @return boolean
 	 */
 	function wp_ulike_validate_ip( $ip ) {
-		return filter_var( $ip, FILTER_VALIDATE_IP ) === false ? false : true;
+		return WP_Ulike_Ip_Detector::validate_ip( $ip );
 	}
 }
 
@@ -412,30 +418,13 @@ if( ! function_exists('wp_ulike_get_period_limit_sql') ){
 
 if( ! function_exists('wp_ulike_get_cloudflare_ips') ){
 	/**
-	 * Get cloudflare ips
+	 * Get Cloudflare IP ranges
 	 *
-	 * @return array
+	 * @return array Array with 'v4' and 'v6' keys containing IP ranges
 	 */
-    function wp_ulike_get_cloudflare_ips(){
-        if (false === ($ipAddresses = get_transient('wp_ulike_cloudflare_ips'))) {
-            $ipAddresses = array_fill_keys(['v4', 'v6'], []);
-            foreach (array_keys($ipAddresses) as $version) {
-                $url = 'https://www.cloudflare.com/ips-'.$version;
-                $response = wp_remote_get($url, ['sslverify' => false]);
-                if (is_wp_error($response)) {
-                    continue;
-                }
-                if ('200' != ($statusCode = wp_remote_retrieve_response_code($response))) {
-                    continue;
-                }
-                $ipAddresses[$version] = array_filter(
-                    (array) preg_split('/\R/', wp_remote_retrieve_body($response))
-                );
-            }
-            set_transient('wp_ulike_cloudflare_ips', $ipAddresses, WEEK_IN_SECONDS);
-        }
-        return $ipAddresses;
-    }
+	function wp_ulike_get_cloudflare_ips(){
+		return WP_Ulike_Ip_Detector::get_cloudflare_ips();
+	}
 }
 
 if( ! function_exists('wp_ulike_site_is_https') ){
@@ -535,65 +524,6 @@ if( ! function_exists('wp_ulike_is_valid_nonce') ){
 
 }
 
-if( ! function_exists('wp_ulike_generate_fingerprint') ){
-	/**
-	 * Generate a secure fingerprint hash for the current user/device session.
-	 *
-	 * This function uses a combination of the real IP address, user agent,
-	 * accept-language, and selected HTTP headers to generate a unique and consistent
-	 * fingerprint per device. It also parses the user agent using DeviceDetector
-	 * to extract client and OS information. If a bot is detected, the function returns false.
-	 *
-	 * @return string|false The hashed fingerprint string, or false if the client is a bot.
-	 */
-	function wp_ulike_generate_fingerprint() {
-		// Get real IP address (never trust spoofed headers)
-		$ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
-
-		// Basic request headers
-		$user_agent      = $_SERVER['HTTP_USER_AGENT'] ?? '';
-		$accept_language = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '';
-
-		if (empty($accept_language)) {
-			$accept_language = 'unknown-lang';
-		}
-
-		// Initialize DeviceDetector to parse the User-Agent
-		$dd = new \DeviceDetector\DeviceDetector($user_agent);
-		$dd->parse();
-
-		// Extract client and OS info
-		$client_info = $dd->getClient(); // ['name' => ..., 'version' => ...]
-		$os_info     = $dd->getOs();     // ['name' => ..., 'version' => ...]
-
-		$client_name    = $client_info['name'] ?? 'unknown-client';
-		$client_version = $client_info['version'] ?? '0.0';
-		$os_name        = $os_info['name'] ?? 'unknown-os';
-		$os_version     = $os_info['version'] ?? '0.0';
-
-		// Extra entropy from request headers (helps resist spoofing)
-		$header_signature = hash('sha256', json_encode([
-			$_SERVER['HTTP_ACCEPT_ENCODING'] ?? '',
-			$_SERVER['HTTP_CONNECTION'] ?? '',
-			$_SERVER['HTTP_CACHE_CONTROL'] ?? '',
-		]));
-
-		// Combine all parts into a unique source string
-		$fingerprint_source = implode('|', [
-			$ip,
-			$client_name,
-			$client_version,
-			$os_name,
-			$os_version,
-			$accept_language,
-			$header_signature
-		]);
-
-		// Return an md5 hash of the fingerprint source
-		return md5($fingerprint_source);
-	}
-}
-
 if( ! function_exists('wp_ulike_is_bot_request') ){
 	/**
 	 * Check if current request is a bot
@@ -601,9 +531,129 @@ if( ! function_exists('wp_ulike_is_bot_request') ){
 	 * @return bool
 	 */
 	function wp_ulike_is_bot_request(){
+		$parser = new WP_Ulike_User_Agent_Parser();
+		$parser->parse();
+		return $parser->is_bot();
+	}
+}
+
+if ( ! function_exists( 'wp_ulike_add_inline_script_data' ) ) {
+	/**
+	 * Attach a global JS object to a registered script handle.
+	 *
+	 * @param string $handle      Script handle.
+	 * @param string $object_name Global variable name.
+	 * @param mixed  $data        Data to encode as JSON.
+	 * @return void
+	 */
+	function wp_ulike_add_inline_script_data( $handle, $object_name, $data ) {
+		if ( ! wp_script_is( $handle, 'registered' ) && ! wp_script_is( $handle, 'enqueued' ) ) {
+			return;
+		}
+
+		wp_add_inline_script(
+			$handle,
+			'var ' . $object_name . ' = ' . wp_json_encode( $data ) . ';',
+			'before'
+		);
+	}
+}
+
+if ( ! function_exists( 'wp_ulike_enqueue_script_with_defer' ) ) {
+	/**
+	 * Enqueue a frontend script with defer strategy when supported.
+	 *
+	 * @param string $handle Script handle.
+	 * @param string $src    Script URL.
+	 * @param array  $deps   Dependencies.
+	 * @param string $ver    Version.
+	 * @return void
+	 */
+	function wp_ulike_enqueue_script_with_defer( $handle, $src, $deps = array(), $ver = false ) {
+		if ( function_exists( 'wp_enqueue_script' ) && version_compare( get_bloginfo( 'version' ), '6.3', '>=' ) ) {
+			wp_enqueue_script(
+				$handle,
+				$src,
+				$deps,
+				$ver,
+				array(
+					'in_footer' => true,
+					'strategy'  => 'defer',
+				)
+			);
+			return;
+		}
+
+		wp_enqueue_script( $handle, $src, $deps, $ver, true );
+	}
+}
+
+if( ! function_exists('wp_ulike_generate_fingerprint') ){
+	/**
+	 * Generate a secure fingerprint hash for the current user/device session.
+	 *
+	 * This function uses a combination of the real IP address, user agent,
+	 * accept-language, and selected HTTP headers to generate a unique and consistent
+	 * fingerprint per device.
+	 *
+	 * @return string The hashed fingerprint string
+	 */
+	function wp_ulike_generate_fingerprint() {
+		$ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
 		$user_agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
-		$device = new \DeviceDetector\DeviceDetector($user_agent);
-		$device->parse();
-		return $device->isBot();
+		$accept_language = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '';
+
+		if (empty($accept_language)) {
+			$accept_language = 'unknown-lang';
+		}
+
+		$parser = new WP_Ulike_User_Agent_Parser( $user_agent );
+		$parser->parse();
+
+		$client_info = $parser->get_client();
+		$os_info = $parser->get_os();
+
+		$header_signature = hash('sha256', json_encode([
+			$_SERVER['HTTP_ACCEPT_ENCODING'] ?? '',
+			$_SERVER['HTTP_CONNECTION'] ?? '',
+			$_SERVER['HTTP_CACHE_CONTROL'] ?? '',
+		]));
+
+		$fingerprint_source = implode('|', [
+			$ip,
+			$client_info['name'] ?? 'unknown-client',
+			$client_info['version'] ?? '0.0',
+			$os_info['name'] ?? 'unknown-os',
+			$os_info['version'] ?? '0.0',
+			$accept_language,
+			$header_signature
+		]);
+
+		return md5($fingerprint_source);
+	}
+}
+
+if ( ! function_exists( 'wp_ulike_read_php_input_capped' ) ) {
+	/**
+	 * Read php://input up to a maximum size (avoids loading huge bodies into memory).
+	 *
+	 * @param int $max_bytes Maximum allowed body length in bytes.
+	 * @return string|\WP_Error Body string, or WP_Error if unreadable or over limit.
+	 */
+	function wp_ulike_read_php_input_capped( $max_bytes ) {
+		$max_bytes = (int) $max_bytes;
+		if ( $max_bytes <= 0 ) {
+			return '';
+		}
+
+		$chunk = file_get_contents( 'php://input', false, null, 0, $max_bytes + 1 );
+		if ( false === $chunk ) {
+			return new WP_Error( 'wp_ulike_read_body', esc_html__( 'Could not read request body.', 'wp-ulike' ) );
+		}
+		if ( strlen( $chunk ) > $max_bytes ) {
+			return new WP_Error( 'wp_ulike_body_too_large', esc_html__( 'Request body is too large.', 'wp-ulike' ) );
+		}
+
+		return $chunk;
 	}
 }

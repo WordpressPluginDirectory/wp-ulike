@@ -3,7 +3,7 @@
  * deprecated class for settings panel
  * 
  * @package    wp-ulike
- * @author     TechnoWich 2025
+ * @author     TechnoWich 2026
  * @link       https://wpulike.com
  */
 
